@@ -14,9 +14,18 @@ function GetImagePreview({
 }) {
     const [preview, setPreview] = useState(null);
 
+    const isValidImage = (file) => {
+        const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
+        return validImageTypes.includes(file.type);
+    };
+
     const handlePreview = (e) => {
         const files = e.target.files;
-        setPreview(URL.createObjectURL(files[0]));
+        if (files.length > 0 && isValidImage(files[0])) {
+            setPreview(URL.createObjectURL(files[0]));
+        } else {
+            setPreview(null);
+        }
         return files;
     };
     return (
