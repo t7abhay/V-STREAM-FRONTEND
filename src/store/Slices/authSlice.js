@@ -105,6 +105,22 @@ export const updateUserDetails = createAsyncThunk("updateUserDetails", async (da
   }
 });
 
+
+
+export const changePassword = createAsyncThunk(
+  "changePassword",
+  async (data) => {
+    try {
+      const response = await axiosInstance.post("/users/change-password", data);
+      toast.success(response.data?.message);
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+      throw error;
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
