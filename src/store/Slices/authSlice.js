@@ -8,11 +8,7 @@ const initialState = {
   userData: null,
 };
 
-
-const getErrorMessage = (error) =>
-  error?.response?.data?.error || "Something went wrong. Please try again.";
-
-export const createAccount = createAsyncThunk("register", async (data, { rejectWithValue }) => {
+export const createAccount = createAsyncThunk("register", async (data) => {
   const formData = new FormData();
   formData.append("avatar", data.avatar[0]);
   formData.append("username", data.username);
@@ -25,87 +21,48 @@ export const createAccount = createAsyncThunk("register", async (data, { rejectW
 
   try {
     const response = await axiosInstance.post("/users/register", formData);
+    console.log(response.data);
     toast.success("Registered successfully!!!");
     return response.data;
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    toast.error(errorMessage);
-    return rejectWithValue(errorMessage);
+    toast.error(error?.response?.data?.error);
+    throw error;
   }
 });
 
-
-export const userLogin = createAsyncThunk("login", async (data, { rejectWithValue }) => {
+export const userLogin = createAsyncThunk("login", async (data) => {
   try {
     const response = await axiosInstance.post("/users/login", data);
     return response.data.data.user;
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    toast.error(errorMessage);
-    return rejectWithValue(errorMessage);
+    toast.error(error?.response?.data?.error);
+    throw error;
   }
 });
 
-
-export const userLogout = createAsyncThunk("logout", async (_, { rejectWithValue }) => {
+export const userLogout = createAsyncThunk("logout", async () => {
   try {
     const response = await axiosInstance.post("/users/logout");
     toast.success(response.data?.message);
     return response.data;
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    toast.error(errorMessage);
-    return rejectWithValue(errorMessage);
+    toast.error(error?.response?.data?.error);
+    throw error;
   }
 });
 
-export const getCurrentUser = createAsyncThunk("getCurrentUser", async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get("/users/current-user");
-    return response.data.data;
-  } catch (error) {
-    return rejectWithValue("Failed to fetch user data");
+export const refreshAccessToken = createAsyncThunk(
+  "refreshAccessToken",
+  async (data) => {
+    try {
+      const response = await axiosInstance.post("/users/refresh-token", data);
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+      throw error;
+    }
   }
-});
-
-
-export const updateAvatar = createAsyncThunk("updateAvatar", async (avatar, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.patch("/users/update-avatar", avatar);
-    toast.success("Avatar updated successfully!");
-    return response.data.data;
-  } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    toast.error(errorMessage);
-    return rejectWithValue(errorMessage);
-  }
-});
-
-export const updateCoverImg = createAsyncThunk("updateCoverImg", async (coverImage, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.patch("/users/update-coverImg", coverImage);
-    toast.success("Cover image updated successfully!");
-    return response.data.data;
-  } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    toast.error(errorMessage);
-    return rejectWithValue(errorMessage);
-  }
-});
-
-export const updateUserDetails = createAsyncThunk("updateUserDetails", async (data, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.patch("/users/update-user", data);
-    toast.success("Details updated successfully!");
-    return response.data;
-  } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    toast.error(errorMessage);
-    return rejectWithValue(errorMessage);
-  }
-});
-
-
+);
 
 export const changePassword = createAsyncThunk(
   "changePassword",
@@ -121,69 +78,123 @@ export const changePassword = createAsyncThunk(
   }
 );
 
+export const getCurrentUser = createAsyncThunk("getCurrentUser", async () => {
+  const response = await axiosInstance.get("/users/current-user");
+  return response.data.data;
+});
+
+export const updateAvatar = createAsyncThunk("updateAvatar", async (avatar) => {
+  try {
+    const response = await axiosInstance.patch("/users/update-avatar", avatar);
+    toast.success("Updated details successfully!!!");
+    return response.data.data;
+  } catch (error) {
+    toast.error(error?.response?.data?.error);
+    throw error;
+  }
+});
+
+export const updateCoverImg = createAsyncThunk(
+  "updateCoverImg",
+  async (coverImage) => {
+    try {
+      const response = await axiosInstance.patch(
+        "/users/update-coverImg",
+        coverImage
+      );
+      toast.success(response.data?.message);
+      return response.data.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+      throw error;
+    }
+  }
+);
+
+export const updateUserDetails = createAsyncThunk(
+  "updateUserDetails",
+  async (data) => {
+    try {
+      const response = await axiosInstance.patch("/users/update-user", data);
+      toast.success("Updated details successfully!!!");
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+      throw error;
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(createAccount.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(createAccount.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(createAccount.rejected, (state) => {
-        state.loading = false;
-      })
-
-      .addCase(userLogin.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(userLogin.fulfilled, (state, action) => {
-        state.loading = false;
-        state.status = true;
-        state.userData = action.payload;
-      })
-      .addCase(userLogin.rejected, (state) => {
-        state.loading = false;
-      })
-
-      .addCase(userLogout.fulfilled, (state) => {
-        state.status = false;
-        state.userData = null;
-      })
-
-      .addCase(getCurrentUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(getCurrentUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.status = true;
-        state.userData = action.payload;
-      })
-      .addCase(getCurrentUser.rejected, (state) => {
-        state.loading = false;
-        state.status = false;
-        state.userData = null;
-      })
-
-      .addCase(updateAvatar.fulfilled, (state, action) => {
-        if (state.userData) {
-          state.userData.avatar = action.payload.avatar;
-        }
-      })
-
-      .addCase(updateCoverImg.fulfilled, (state, action) => {
-        if (state.userData) {
-          state.userData.coverImage = action.payload.coverImage;
-        }
-      })
-
-      .addCase(updateUserDetails.fulfilled, (state, action) => {
-        state.userData = { ...state.userData, ...action.payload };
-      });
+    builder.addCase(createAccount.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(createAccount.fulfilled, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(userLogin.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(userLogin.fulfilled, (state, action) => {
+      state.loading = false;
+      state.status = true;
+      state.userData = action.payload;
+    });
+    builder.addCase(userLogout.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(userLogout.fulfilled, (state) => {
+      state.loading = false;
+      state.status = false;
+      state.userData = null;
+    });
+    builder.addCase(getCurrentUser.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getCurrentUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.status = true;
+      state.userData = action.payload;
+    });
+    builder.addCase(getCurrentUser.rejected, (state) => {
+      state.loading = false;
+      state.status = false;
+      state.userData = null;
+    });
+    builder.addCase(updateAvatar.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateAvatar.fulfilled, (state, action) => {
+      state.loading = false;
+      state.userData = action.payload;
+    });
+    builder.addCase(updateAvatar.rejected, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(updateCoverImg.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateCoverImg.fulfilled, (state, action) => {
+      state.loading = false;
+      state.userData = action.payload;
+    });
+    builder.addCase(updateCoverImg.rejected, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(updateUserDetails.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateUserDetails.fulfilled, (state, action) => {
+      state.loading = false;
+      state.userData = action.payload;
+    });
   },
 });
+
+// export const { updateUser } = authSlice.actions;
 
 export default authSlice.reducer;
