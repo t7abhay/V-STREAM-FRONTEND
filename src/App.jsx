@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
-import { AuthLayout, Login, SignUp } from "./components/index";
+import { AuthLayout, Login, SignUp } from "./components/index.js";
 import { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./store/Slices/authSlice";
