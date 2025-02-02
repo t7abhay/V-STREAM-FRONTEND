@@ -21,6 +21,7 @@ export const createAccount = createAsyncThunk("register", async (data) => {
 
   try {
     const response = await axiosInstance.post("/users/register", formData);
+    console.log(response.data);
     toast.success("Registered successfully!!!");
     return response.data;
   } catch (error) {
@@ -28,7 +29,6 @@ export const createAccount = createAsyncThunk("register", async (data) => {
     throw error;
   }
 });
-
 
 export const userLogin = createAsyncThunk("login", async (data) => {
   try {
@@ -55,7 +55,10 @@ export const refreshAccessToken = createAsyncThunk(
   "refreshAccessToken",
   async (data) => {
     try {
-      const response = await axiosInstance.post("/users/refresh-token", data);
+      const response = await axiosInstance.post(
+        "/users/refresh-token",
+        data
+      );
       return response.data;
     } catch (error) {
       toast.error(error?.response?.data?.error);
@@ -68,7 +71,10 @@ export const changePassword = createAsyncThunk(
   "changePassword",
   async (data) => {
     try {
-      const response = await axiosInstance.post("/users/change-password", data);
+      const response = await axiosInstance.post(
+        "/users/change-password",
+        data
+      );
       toast.success(response.data?.message);
       return response.data;
     } catch (error) {
@@ -85,7 +91,10 @@ export const getCurrentUser = createAsyncThunk("getCurrentUser", async () => {
 
 export const updateAvatar = createAsyncThunk("updateAvatar", async (avatar) => {
   try {
-    const response = await axiosInstance.patch("/users/update-avatar", avatar);
+    const response = await axiosInstance.patch(
+      "/users/update-avatar",
+      avatar
+    );
     toast.success("Updated details successfully!!!");
     return response.data.data;
   } catch (error) {
@@ -115,7 +124,10 @@ export const updateUserDetails = createAsyncThunk(
   "updateUserDetails",
   async (data) => {
     try {
-      const response = await axiosInstance.patch("/users/update-user", data);
+      const response = await axiosInstance.patch(
+        "/users/update-user",
+        data
+      );
       toast.success("Updated details successfully!!!");
       return response.data;
     } catch (error) {
@@ -195,6 +207,5 @@ const authSlice = createSlice({
   },
 });
 
-// export const { updateUser } = authSlice.actions;
 
 export default authSlice.reducer;
