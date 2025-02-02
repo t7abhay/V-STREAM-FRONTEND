@@ -13,6 +13,7 @@ function Login() {
         register,
         formState: { errors },
     } = useForm();
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const loading = useSelector((state) => state.auth?.loading);
@@ -23,7 +24,7 @@ function Login() {
             ? { email: data.username, password: data.password }
             : data;
 
-        const response = await dispatch(userLogin(loginData));
+        const response = dispatch(userLogin(loginData));
         const user = await dispatch(getCurrentUser());
         if (user && response?.payload) {
             navigate("/");
@@ -46,6 +47,7 @@ function Login() {
                         onSubmit={handleSubmit(submit)}
                         className="space-y-5 p-2"
                     >
+
                         <Input
                             label="Username / email : "
                             type="text"
@@ -62,7 +64,7 @@ function Login() {
                         <Input
                             label="Password: "
                             type="password"
-                            placeholder="1kd074fjw0"
+                            placeholder="some@password"
                             {...register("password", {
                                 required: "password is required",
                             })}
