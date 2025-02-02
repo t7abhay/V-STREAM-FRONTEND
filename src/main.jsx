@@ -9,9 +9,7 @@ import store from "./store/store.js";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
         <BrowserRouter
-            future={{
-                v7_relativeSplatPath: true,
-            }}
+
         >
             <App />
         </BrowserRouter>
