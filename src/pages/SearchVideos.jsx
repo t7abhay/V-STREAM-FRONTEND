@@ -33,7 +33,7 @@ function SearchVideos() {
     setSearchParms({ sortBy: newSortBy, sortType: newSortType });
   };
 
-  if (videos?.totalDocs === 0) {
+  if (videos?.length === 0) {
     return <NoVideosFound text={"Try searching something else"} />;
   }
 
@@ -90,7 +90,7 @@ function SearchVideos() {
         )}
         <div className="grid h-screen xl:grid-cols-3 sm:grid-cols-2 grid-cols-1 text-white overflow-y-scroll">
           {videos &&
-            videos?.docs?.map((video) => (
+            videos.map((video) => (
               <VideoList
                 key={video?._id}
                 thumbnail={video?.thumbnail?.url}
