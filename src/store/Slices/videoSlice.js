@@ -7,10 +7,7 @@ const initialState = {
   loading: false,
   uploading: false,
   uploaded: false,
-  videos: {
-    docs: [],
-    hasNextPage: false,
-  },
+  videos: [],
 
   video: null,
   publishToggled: false,
