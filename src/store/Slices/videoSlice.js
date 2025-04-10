@@ -7,10 +7,7 @@ const initialState = {
   loading: false,
   uploading: false,
   uploaded: false,
-  videos: {
-    docs: [],
-    hasNextPage: false,
-  },
+  videos: [],
   video: null,
   publishToggled: false,
 };
@@ -31,7 +28,6 @@ export const getAllVideos = createAsyncThunk(
       }
 
       const response = await axiosInstance.get(url);
-
       return response.data.data;
     } catch (error) {
       toast.error(error?.response?.data?.error);
@@ -131,7 +127,7 @@ const videoSlice = createSlice({
       state.uploaded = false;
     },
     makeVideosNull: (state) => {
-      state.videos.docs = [];
+      state.videos = [];
     },
   },
   extraReducers: (builder) => {
@@ -140,8 +136,11 @@ const videoSlice = createSlice({
     });
     builder.addCase(getAllVideos.fulfilled, (state, action) => {
       state.loading = false;
-      state.videos.docs = [...state.videos.docs, ...action.payload.docs];
-      state.videos.hasNextPage = action.payload.hasNextPage;
+      state.videos = [...state.videos, ...action.payload.videos];
+      state.pagination = action.payload.pagination;
+    });
+    builder.addCase(getAllVideos.rejected, (state) => {
+      state.loading = false;
     });
     builder.addCase(publishAvideo.pending, (state) => {
       state.uploading = true;
